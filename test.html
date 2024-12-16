@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Extensions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            color: #000000;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .dropdown-section {
+            margin-bottom: 20px;
+        }
+        .dropdown-section label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+            color: #333;
+        }
+        .dropdown {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+        }
+        .dropdown:disabled {
+            background-color: #e9e9e9;
+            cursor: not-allowed;
+        }
+        .result-section {
+            margin-top: 30px;
+            display: none;
+        }
+        .result-section.visible {
+            display: block;
+        }
+        .result {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            background: #f7f7f7;
+        }
+        .result a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .result a:hover {
+            text-decoration: underline;
+        }
+        .hidden {
+            display: none;
+        }
+        .see-all {
+            display: block;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 14px;
+            color: #007bff;
+            cursor: pointer;
+        }
+        .see-all:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Download the Right Extension</h1>
+    <div class="container">
+        <!-- OS Dropdown -->
+        <div class="dropdown-section" id="osSection">
+            <label for="osFilter">Select your Operating System</label>
+            <select id="osFilter" class="dropdown">
+                <option value="all" disabled selected>Select OS</option>
+                <option value="Windows">Windows</option>
+                <option value="Linux">Linux</option>
+                <option value="Darwin (Mac)">Darwin (Mac)</option>
+            </select>
+            <p>Choose the operating system where you want to use the extension.</p>
+        </div>
+
+        <!-- Sensitivity Dropdown -->
+        <div class="dropdown-section" id="sensitivitySection">
+            <label for="sensitivityFilter">Select Data Sensitivity Level</label>
+            <select id="sensitivityFilter" class="dropdown">
+                <option value="all" disabled selected>Select Data Sensitivity</option>
+                <option value="C2">C2</option>
+                <option value="C3-CA">C3-CA</option>
+            </select>
+            <p>Level 2 is for moderately sensitive data. Level 3 is for highly sensitive data.</p>
+        </div>
+
+        <!-- Build Dropdown -->
+        <div class="dropdown-section" id="buildSection">
+            <label for="buildFilter">Select Build Type</label>
+            <select id="buildFilter" class="dropdown">
+                <option value="all" disabled selected>Select Build Type</option>
+                <option value="x64">x64</option>
+                <option value="arm64">ARM64</option>
+            </select>
+            <p>Choose the build type that matches your system architecture.</p>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result-section" id="resultsSection">
+            <h2>Available Downloads:</h2>
+            <div id="results">
+                <!-- Example results -->
+                <div class="result" data-os="Windows" data-sensitivity="C3-CA" data-build="x64">
+                    <strong>Extension A</strong><br>
+                    OS: Windows | Sensitivity: C3-CA | Build: x64<br>
+                    <a href="https://example.com/a">Download</a>
+                </div>
+                <!-- Add more results as needed -->
+            </div>
+            <!-- See All Link -->
+            <span class="see-all" id="seeAllLink">See all other options</span>
+        </div>
+    </div>
+
+    <script>
+        // Get elements
+        const osFilter = document.getElementById('osFilter');
+        const sensitivityFilter = document.getElementById('sensitivityFilter');
+        const buildFilter = document.getElementById('buildFilter');
+        const resultsSection = document.getElementById('resultsSection');
+        const results = document.getElementById('results').getElementsByClassName('result');
+        const seeAllLink = document.getElementById('seeAllLink');
+
+        // Function to filter results
+        function filterResults() {
+            const selectedOS = osFilter.value;
+            const selectedSensitivity = sensitivityFilter.value;
+            const selectedBuild = buildFilter.value;
+
+            // Show results only when all options are selected
+            if (selectedOS !== 'all' && selectedSensitivity !== 'all' && selectedBuild !== 'all') {
+                let visibleCount = 0;
+
+                for (let result of results) {
+                    const resultOS = result.getAttribute('data-os');
+                    const resultSensitivity = result.getAttribute('data-sensitivity');
+                    const resultBuild = result.getAttribute('data-build');
+
+                    const matchesOS = selectedOS === resultOS;
+                    const matchesSensitivity = selectedSensitivity === resultSensitivity;
+                    const matchesBuild = selectedBuild === resultBuild;
+
+                    if (matchesOS && matchesSensitivity && matchesBuild) {
+                        result.classList.remove('hidden');
+                        visibleCount++;
+                    } else {
+                        result.classList.add('hidden');
+                    }
+                }
+
+                // Show results section only if there are visible items
+                resultsSection.classList.add('visible');
+            } else {
+                resultsSection.classList.remove('visible');
+            }
+        }
+
+        // Disable ARM64 for Windows
+        osFilter.addEventListener('change', () => {
+            if (osFilter.value === 'Windows') {
+                buildFilter.querySelector('option[value="arm64"]').disabled = true;
+                buildFilter.querySelector('option[value="arm64"]').style.color = '#ccc';
+            } else {
+                buildFilter.querySelector('option[value="arm64"]').disabled = false;
+                buildFilter.querySelector('option[value="arm64"]').style.color = '';
+            }
+            filterResults();
+        });
+
+        // Show all options when "See all other options" is clicked
+        seeAllLink.addEventListener('click', () => {
+            resultsSection.classList.add('visible');
+            for (let result of results) {
+                result.classList.remove('hidden');
+            }
+        });
+
+        // Add event listeners
+        sensitivityFilter.addEventListener('change', filterResults);
+        buildFilter.addEventListener('change', filterResults);
+    </script>
+</body>
+</html>
