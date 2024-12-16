@@ -141,26 +141,26 @@
         const resultsSection = document.getElementById('resultsSection');
         const results = document.getElementById('results').getElementsByClassName('result');
         const seeAllLink = document.getElementById('seeAllLink');
-
+    
         // Function to filter results
         function filterResults() {
             const selectedOS = osFilter.value;
             const selectedSensitivity = sensitivityFilter.value;
             const selectedBuild = buildFilter.value;
-
+    
             // Show results only when all options are selected
             if (selectedOS !== 'all' && selectedSensitivity !== 'all' && selectedBuild !== 'all') {
                 let visibleCount = 0;
-
+    
                 for (let result of results) {
                     const resultOS = result.getAttribute('data-os');
                     const resultSensitivity = result.getAttribute('data-sensitivity');
                     const resultBuild = result.getAttribute('data-build');
-
+    
                     const matchesOS = selectedOS === resultOS;
                     const matchesSensitivity = selectedSensitivity === resultSensitivity;
                     const matchesBuild = selectedBuild === resultBuild;
-
+    
                     if (matchesOS && matchesSensitivity && matchesBuild) {
                         result.classList.remove('hidden');
                         visibleCount++;
@@ -168,14 +168,22 @@
                         result.classList.add('hidden');
                     }
                 }
-
+    
                 // Show results section only if there are visible items
                 resultsSection.classList.add('visible');
             } else {
                 resultsSection.classList.remove('visible');
             }
         }
-
+    
+        // Show all results when "Show all other results" is clicked
+        seeAllLink.addEventListener('click', () => {
+            resultsSection.classList.add('visible'); // Ensure the results section is visible
+            for (let result of results) {
+                result.classList.remove('hidden'); // Display all results
+            }
+        });
+    
         // Disable ARM64 for Windows
         osFilter.addEventListener('change', () => {
             if (osFilter.value === 'Windows') {
@@ -185,20 +193,13 @@
                 buildFilter.querySelector('option[value="arm64"]').disabled = false;
                 buildFilter.querySelector('option[value="arm64"]').style.color = '';
             }
-            filterResults();
+            filterResults(); // Trigger filtering after changing the OS
         });
-
-        // Show all options when "See all other options" is clicked
-        seeAllLink.addEventListener('click', () => {
-            resultsSection.classList.add('visible');
-            for (let result of results) {
-                result.classList.remove('hidden');
-            }
-        });
-
-        // Add event listeners
+    
+        // Add event listeners for filtering
         sensitivityFilter.addEventListener('change', filterResults);
         buildFilter.addEventListener('change', filterResults);
     </script>
+    
 </body>
 </html>
